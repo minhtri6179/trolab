@@ -1,0 +1,67 @@
+services:
+  traefik:
+    image: traefik:v3.6
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=minhtri.ngt@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./letsencrypt:/letsencrypt
+    networks:
+      - web
+
+  comingsoon:
+    image: nginx:alpine
+    volumes:
+      - ./static:/usr/share/nginx/html:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.comingsoon.rule=Host(`trolab.site`)"
+
+      - "traefik.http.routers.comingsoon.entrypoints=web,websecure"
+      - "traefik.http.routers.comingsoon.tls.certresolver=myresolver"
+
+      - "traefik.http.services.comingsoon.loadbalancer.server.port=80"
+      - "traefik.http.routers.comingsoon.tls=true"
+    networks:
+      - web
+    
+  mkdocs:
+    container_name: mkdocs
+    image: squidfunk/mkdocs-material
+    restart: always
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mkdocs.rule=Host(`docs.trolab.site`)"
+
+      - "traefik.http.routers.mkdocs.tls.certresolver=myresolver"
+      - "traefik.http.routers.mkdocs.entrypoints=web,websecure"
+
+      - "traefik.http.services.mkdocs.loadbalancer.server.port=8000"
+      - "traefik.http.routers.mkdocs.tls=true"
+    volumes:
+      - ./mkdoc:/docs
+    networks: 
+      - web
+
+
+networks:
+  web:
+    driver: bridge
+
