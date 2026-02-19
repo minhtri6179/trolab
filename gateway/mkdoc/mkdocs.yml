@@ -1,6 +1,47 @@
+gateway/mkdoc/mkdocs:
+  yml:
 site_name: "Simple docs"
 theme:
   name: "material"
+  font:
+    text: Merriweather Sans
+    code: Red Hat Mono
+  favicon: assets/logo.ico
+  palette:
+    - scheme: state 
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+      primary: green
+      accent: deep purple
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-outline
+        name: Switch to light mode
+      primary: blue
+      accent: deep ocean
+
+
+
 nav:
   - Home: index.md
   - About: about.md
+
+
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+
