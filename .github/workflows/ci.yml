@@ -21,6 +21,9 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "gateway/mkdoc/*"
           target: "/home/trinm/trolab/gateway/mkdoc"
+          strip_components: 2
+          sync: true
+
 
       - name: Deploy on VPS
         uses: appleboy/ssh-action@v1.0.3
